@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -12,13 +11,487 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
-        /* CSS styles trimmed for brevity */
+        /* 기본 폰트 및 스무딩, 부드러운 스크롤 설정 */
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Noto Sans KR', 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #0f172a; /* Fallback color */
+            color: white;
+        }
+        /* 배경 이미지 래퍼 */
+        #background-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -10;
+            background-size: cover;
+            background-position: center;
+            transition: background-image 1.5s ease-in-out;
+        }
+        /* 가독성을 위한 어두운 오버레이 */
+        #background-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.75); /* Dark overlay */
+        }
+        /* 페이지 섹션 기본 숨김 및 애니메이션 */
+        .page-section {
+            display: none;
+        }
+        .page-section.visible {
+            display: block;
+            animation: fadeIn 0.7s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* 활성화된 네비게이션 링크 스타일 */
+        .nav-link.active {
+            color: #67e8f9; /* text-cyan-300 */
+            border-bottom: 2px solid #67e8f9;
+        }
+        /* 이미지 글로우 효과 */
+        .glow-effect {
+            transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+            border-radius: 1rem;
+        }
+        .glow-effect:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 15px rgba(100, 181, 246, 0.4), 0 0 30px rgba(139, 92, 246, 0.3);
+        }
+        /* AI 전략 섹션 카드 스타일 */
+        #strategy-container {
+            position: relative;
+            width: 100%;
+            min-height: 500px; /* 모바일 높이 */
+            margin-top: 5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        @media (min-width: 768px) { /* md breakpoint */
+            #strategy-container {
+                min-height: 600px;
+                margin-top: 7rem;
+            }
+        }
+        .strategy-card {
+            background-color: rgba(30, 41, 59, 0.7); /* bg-slate-800/70 */
+            backdrop-filter: blur(10px);
+            border: 1px solid #334155; /* border-slate-700 */
+            border-radius: 1rem;
+            padding: 1.5rem;
+            position: absolute;
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), z-index 0.4s;
+            width: 90%;
+            max-width: 380px;
+        }
+        .strategy-card p {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 6; /* 6줄 후 텍스트 자르기 */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            height: 120px; /* 6 lines * 20px line-height */
+        }
+        .strategy-card:hover {
+            transform: scale(1.1) rotate(0deg) !important;
+            z-index: 100 !important;
+        }
+        .strategy-card:hover p {
+            -webkit-line-clamp: unset; /* 호버 시 전체 내용 표시 */
+            height: auto;
+        }
+        /* 개별 카드 위치 및 회전 (데스크탑) */
+        @media (min-width: 768px) {
+            .strategy-card:nth-child(1) { transform: rotate(-10deg) translateX(-150px); z-index: 1; }
+            .strategy-card:nth-child(2) { transform: rotate(5deg) translateX(50px) translateY(-50px); z-index: 2; }
+            .strategy-card:nth-child(3) { transform: rotate(12deg) translateX(150px) translateY(100px); z-index: 3; }
+            .strategy-card:nth-child(4) { transform: rotate(-3deg) translateX(-50px) translateY(80px); z-index: 4; }
+        }
+        /* 모바일용 카드 위치 */
+        @media (max-width: 767px) {
+            .strategy-card {
+                position: relative;
+                transform: rotate(0) !important;
+                margin-bottom: -150px; /* 카드 겹침 효과 */
+            }
+            .strategy-card:nth-child(1) { transform: translateY(0px) scale(0.85); z-index: 1; }
+            .strategy-card:nth-child(2) { transform: translateY(0px) scale(0.90); z-index: 2; }
+            .strategy-card:nth-child(3) { transform: translateY(0px) scale(0.95); z-index: 3; }
+            .strategy-card:nth-child(4) { transform: translateY(0px) scale(1.0); z-index: 4; }
+            
+            #strategy-container {
+                display: block;
+                padding-top: 180px;
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- Body content trimmed for brevity -->
+
+    <div id="background-wrapper"></div>
+
+    <!-- 상단 네비게이션 -->
+    <nav class="bg-slate-900/50 backdrop-blur-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-center h-16">
+                <div class="flex flex-wrap justify-center space-x-4 md:space-x-6 text-xs sm:text-sm md:text-base">
+                    <a href="#solution" class="nav-link px-2 md:px-3 py-2 rounded-md font-medium text-slate-300 hover:text-white transition-all duration-300">AI 솔루션</a>
+                    <a href="#design" class="nav-link px-2 md:px-3 py-2 rounded-md font-medium text-slate-300 hover:text-white transition-all duration-300">제품&키비주얼</a>
+                    <a href="#model" class="nav-link px-2 md:px-3 py-2 rounded-md font-medium text-slate-300 hover:text-white transition-all duration-300">AI 모델</a>
+                    <a href="#strategy" class="nav-link px-2 md:px-3 py-2 rounded-md font-medium text-slate-300 hover:text-white transition-all duration-300">AI 전략</a>
+                    <a href="#detail" class="nav-link px-2 md:px-3 py-2 rounded-md font-medium text-slate-300 hover:text-white transition-all duration-300">AI 상세페이지</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 py-16 md:py-24">
+
+        <!-- 페이지 1: AI 솔루션 소개 -->
+        <section id="solution" class="page-section">
+            <header class="text-center max-w-4xl mx-auto">
+                <h1 class="text-4xl md:text-6xl font-black leading-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-red-400 via-amber-400 to-yellow-300">
+                    전문가를 쓰고 싶어도<br>비용 때문에 고민이시라고요?
+                </h1>
+                <p class="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto mt-6">
+                    높은 제작비, 긴 소요 시간, 복잡한 소통 과정은 이제 그만. AI 마케팅 에이전트가 당신의 브랜드를 위한 모든 콘텐츠를 즉시, 합리적인 비용으로 해결해 드립니다.
+                </p>
+                <button onclick="navigateTo('design')" class="mt-10 px-8 py-4 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-lg font-bold transition-all duration-300 transform hover:scale-105 shadow-lg shadow-indigo-500/50">
+                    AI 솔루션 자세히 보기
+                </button>
+            </header>
+
+            <div class="my-20 md:my-28 space-y-16">
+                 <!-- 1. 타겟 고객 -->
+                <div>
+                    <h3 class="flex items-center justify-center text-2xl font-semibold mb-8"><span class="text-3xl mr-3">🎯</span> 타겟 고객</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="bg-slate-800/50 backdrop-blur-sm p-8 rounded-2xl border border-slate-700">
+                            <h4 class="font-bold text-xl text-green-300 mb-4">A군: 수출을 꿈꾸는 제조사/브랜드</h4>
+                            <p class="text-slate-300 mb-4">K-뷰티, 소형 전자제품, 건강식품 등</p>
+                            <p class="font-semibold text-red-400">문제점:</p>
+                            <ul class="list-disc list-inside text-slate-400">
+                                <li>높은 콘텐츠 제작 비용과 리소스 부족</li>
+                                <li>해외 시장 진출 및 마케팅 경험 부족</li>
+                            </ul>
+                        </div>
+                         <div class="bg-slate-800/50 backdrop-blur-sm p-8 rounded-2xl border border-slate-700">
+                            <h4 class="font-bold text-xl text-cyan-300 mb-4">B군: 소상공인 및 신생 브랜드</h4>
+                            <p class="text-slate-300 mb-4">로컬 카페/디저트, 패션, 생활용품 등</p>
+                             <p class="font-semibold text-red-400">문제점:</p>
+                            <ul class="list-disc list-inside text-slate-400">
+                                <li>브랜딩 및 온라인 콘텐츠 노출 부족</li>
+                                <li>마케팅 전문 인프라 부재</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. 해결책 -->
+                <div>
+                    <h3 class="flex items-center justify-center text-2xl font-semibold mb-8"><span class="text-3xl mr-3">💡</span> 해결책: AI 마케팅 에이전트</h3>
+                    <div class="bg-slate-800/50 backdrop-blur-sm p-8 rounded-2xl border border-slate-700 space-y-4">
+                        <p class="flex items-start"><span class="text-green-400 mr-3 mt-1">✓</span> <span><strong class="text-white">원클릭 콘텐츠 자동 생성:</strong> 키비주얼, AI 모델 영상, 제품 소개 콘텐츠를 클릭 몇 번으로 제작합니다.</span></p>
+                        <p class="flex items-start"><span class="text-green-400 mr-3 mt-1">✓</span> <span><strong class="text-white">AI 카피라이팅:</strong> 브랜드 톤에 맞는 SNS 게시글, 상세페이지 문구를 자동으로 생성합니다.</span></p>
+                        <p class="flex items-start"><span class="text-green-400 mr-3 mt-1">✓</span> <span><strong class="text-white">글로벌 현지화:</strong> 타겟 국가의 언어와 문화에 맞춰 콘텐츠를 자동으로 번역하고 커스터마이징합니다.</span></p>
+                        <p class="flex items-start"><span class="text-green-400 mr-3 mt-1">✓</span> <span><strong class="text-white">성과 예측:</strong> AI 기반으로 광고 성과를 예측하고 최적의 타겟과 예산을 시뮬레이션합니다.</span></p>
+                    </div>
+                </div>
+
+                <!-- 3. 제공 방식 -->
+                <div>
+                     <h3 class="flex items-center justify-center text-2xl font-semibold mb-8"><span class="text-3xl mr-3">⚙️</span> 제공 방식</h3>
+                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="bg-slate-800/50 backdrop-blur-sm p-8 rounded-2xl border border-slate-700">
+                            <h4 class="font-bold text-xl text-purple-400 mb-3">Self-Service 플랫폼</h4>
+                            <p class="text-slate-300">사용자가 직접 클릭 몇 번으로 원하는 AI 콘텐츠를 쉽고 빠르게 생성하는 웹 툴입니다.</p>
+                        </div>
+                         <div class="bg-slate-800/50 backdrop-blur-sm p-8 rounded-2xl border border-slate-700">
+                            <h4 class="font-bold text-xl text-indigo-400 mb-3">전문가 템플릿</h4>
+                            <p class="text-slate-300">업계 최고 전문가가 미리 세팅한 템플릿과 AI 콘텐츠를 활용하여 완성도를 극대화합니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 페이지 2: 제품/키비주얼 생성 -->
+        <section id="design" class="page-section">
+             <header class="text-center max-w-4xl mx-auto">
+                <h1 class="text-4xl md:text-6xl font-black leading-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-blue-400 to-purple-500">
+                    제품 목업 한 장만 올리면,<br>작품이 됩니다.
+                </h1>
+                <p class="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto mt-6">
+                    밋밋한 목업 사진을 올리세요. AI가 타겟 시장과 브랜드 톤앤매너에 맞춰, 성공 사례를 학습한 노하우로 가장 매력적인 제품 디자인과 키비주얼을 생성합니다.
+                </p>
+            </header>
+            
+            <main class="mt-20 md:mt-28">
+                <div class="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-4">
+                    <div class="w-full max-w-sm">
+                        <h2 class="text-2xl font-bold text-center mb-4 text-slate-400">Original Mockup</h2>
+                        <div class="bg-slate-800/50 backdrop-blur-sm p-4 rounded-xl border border-slate-700">
+                            <img src="https://gi.esmplus.com/meme153/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%202025-06-12%20190727.png" alt="오리지널 앰플 병 목업" class="w-full h-auto rounded-lg object-cover" onerror="this.onerror=null;this.src='https.placehold.co/600x800/1e293b/ffffff?text=Original';">
+                        </div>
+                    </div>
+                    <div class="transform rotate-90 lg:rotate-0 my-4 lg:my-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                    </div>
+                    <div class="w-full max-w-2xl">
+                         <h2 class="text-2xl font-bold text-center mb-4 text-slate-300">AI Recommendation</h2>
+                        <div class="flex flex-col sm:flex-row gap-8 items-start">
+                            <div class="flex-1 w-full">
+                                <h3 class="font-semibold text-center mb-2 text-green-400">추천 키비주얼</h3>
+                                <div class="flex flex-col gap-8">
+                                    <div class="glow-effect bg-slate-800/50 backdrop-blur-sm p-4 rounded-xl border border-slate-700">
+                                        <img src="https://gi.esmplus.com/meme153/%EB%AA%A8%EB%8D%B8%202.png" alt="AI가 추천한 키비주얼 1" class="w-full h-auto rounded-lg object-cover" onerror="this.onerror=null;this.src='https.placehold.co/600x800/1e293b/ffffff?text=Key+Visual+1';">
+                                    </div>
+                                    <div class="glow-effect bg-slate-800/50 backdrop-blur-sm p-4 rounded-xl border border-slate-700">
+                                        <img src="https://gi.esmplus.com/meme153/%EB%AA%A8%EB%8D%B8%201.png" alt="AI가 추천한 키비주얼 2" class="w-full h-auto rounded-lg object-cover" onerror="this.onerror=null;this.src='https.placehold.co/600x800/1e293b/ffffff?text=Key+Visual+2';">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-1 w-full">
+                                <h3 class="font-semibold text-center mb-2 text-cyan-400">추천 제품 디자인</h3>
+                                <div class="flex flex-col gap-8">
+                                    <div class="glow-effect bg-slate-800/50 backdrop-blur-sm p-4 rounded-xl border border-slate-700">
+                                        <img src="https://gi.esmplus.com/meme153/AI%EB%A1%9C%EC%83%9D%EC%84%B1%EB%90%9C%20%EC%95%B0%ED%94%8C%EB%B3%91.png" alt="AI가 추천한 제품 디자인 1" class="w-full h-auto rounded-lg object-cover" onerror="this.onerror=null;this.src='https.placehold.co/600x800/1e293b/ffffff?text=Product+Design+1';">
+                                    </div>
+                                    <div class="glow-effect bg-slate-800/50 backdrop-blur-sm p-4 rounded-xl border border-slate-700">
+                                        <img src="https.gi.esmplus.com/meme153/AI%EB%A1%9C%EC%83%9D%EC%84%B1%EB%90%9C%20%EC%95%B0%ED%94%8C%EB%B3%913.png" alt="AI가 추천한 제품 디자인 2" class="w-full h-auto rounded-lg object-cover" onerror="this.onerror=null;this.src='https.placehold.co/600x800/1e293b/ffffff?text=Product+Design+2';">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </section>
+
+        <!-- 페이지 3: AI 모델 생성 -->
+        <section id="model" class="page-section">
+            <header class="text-center max-w-4xl mx-auto">
+                <h1 class="text-4xl md:text-6xl font-black leading-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-green-300 via-blue-400 to-purple-500">
+                    클릭 한 번이면,<br>내 제품이 AI 모델과 함께.
+                </h1>
+                <p class="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mt-6">
+                    더 이상 모델 섭외, 스케줄 조율, 값비싼 촬영 비용으로 고민하지 마세요. 제품 사진만 올리면, 타겟 고객에게 가장 어필하는 AI 모델과 함께 찍은 고퀄리티 콘텐츠가 즉시 생성됩니다.
+                </p>
+            </header>
+            <main class="mt-20 md:mt-28">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 lg:gap-12 max-w-4xl mx-auto">
+                    <div class="glow-effect bg-slate-800/50 backdrop-blur-sm p-4 rounded-xl border border-slate-700"><img src="https://gi.esmplus.com/meme153/%EB%AA%A8%EB%8D%B8%201.png" alt="AI 모델 사진" class="w-full h-auto rounded-lg object-cover" onerror="this.onerror=null;this.src='https.placehold.co/600x800/1e293b/ffffff?text=Image+1';"></div>
+                    <div class="glow-effect bg-slate-800/50 backdrop-blur-sm p-4 rounded-xl border border-slate-700"><img src="https://gi.esmplus.com/meme153/%EC%9A%B8%EA%B8%88%EB%85%80.gif" alt="울고 있는 여성의 GIF" class="w-full h-auto rounded-lg object-cover" onerror="this.onerror=null;this.src='https.placehold.co/600x800/1e293b/ffffff?text=Image+2';"></div>
+                    <div class="glow-effect bg-slate-800/50 backdrop-blur-sm p-4 rounded-xl border border-slate-700"><img src="https://gi.esmplus.com/meme153/K_%EB%B7%B0%ED%8B%B0_%EB%AA%A8%EB%8D%B8_%EC%98%81%EC%83%81_%EC%83%9D%EC%84%B1%EB%90%A8.gif" alt="뷰티 모델 영상 생성 GIF" class="w-full h-auto rounded-lg object-cover" onerror="this.onerror=null;this.src='https.placehold.co/600x800/1e293b/ffffff?text=Image+3';"></div>
+                    <div class="glow-effect bg-slate-800/50 backdrop-blur-sm p-4 rounded-xl border border-slate-700"><img src="https://gi.esmplus.com/meme153/%EC%9A%B8%EA%B8%88%EB%BF%8C%EB%A6%AC%EB%8A%94%EB%85%80.gif" alt="울음을 뿌리는 여성 GIF" class="w-full h-auto rounded-lg object-cover" onerror="this.onerror=null;this.src='https.placehold.co/600x800/1e293b/ffffff?text=Image+4';"></div>
+                </div>
+            </main>
+        </section>
+
+        <!-- 페이지 4: AI 전략 -->
+        <section id="strategy" class="page-section">
+            <header class="text-center max-w-4xl mx-auto">
+                <h1 class="text-4xl md:text-6xl font-black leading-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-teal-300 via-sky-400 to-indigo-500">
+                    클릭 몇 번으로,<br>이제 마케팅 전략도 끝.
+                </h1>
+                <p class="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto mt-6">
+                    더 이상 막막한 시장 조사와 분석에 시간을 낭비하지 마세요. AI가 타겟 국가 선정부터 경쟁사 분석, 성공 브랜드 벤치마킹, 크리에이티브 컨셉까지 도출하여 실행 가능한 전략을 제안합니다.
+                </p>
+            </header>
+
+            <div id="strategy-container">
+                <!-- 카드 순서는 z-index 역순으로 배치해야 hover가 자연스러움 -->
+                <div class="strategy-card">
+                    <h4 class="font-bold text-lg text-rose-400 mb-2">🇲🇾 경쟁사 벤치마크 비교표</h4>
+                    <p class="text-sm text-slate-400">항목 / Bride Timeless Serum / The Ordinary / Some By Mi...<br>핵심 성분: EGF 10ppm vs Copper Peptides vs Snail Mucin...<br>기능/효과: 주름 개선, 미백 vs 노화방지, 탄력...<br>가격대(RM): 145–160 vs 135–155 vs 85–95...<br>차별 포인트: 신부 콘셉트, 침투력 vs 항노화 vs 여드름 진정...<br>🧠 요약 분석: Bride Timeless Serum의 강점은 '신부 루틴'이라는 감성적 소구와 기능적 차별화에 있음...</p>
+                </div>
+                <div class="strategy-card">
+                    <h4 class="font-bold text-lg text-amber-400 mb-2">📈 성공 K-뷰티 브랜드 벤치마크</h4>
+                    <p class="text-sm text-slate-400">1. Glow Recipe – Watermelon Glow: TikTok에서 '글로우 스킨' 트렌드를 활용하여 광채 효과를 강조.<br>2. Laneige – Lip Sleeping Mask: '밤 사이 입술 케어'라는 메시지로 사용 전후 변화를 강조.<br>3. COSRX – Advanced Snail 96: 사용자의 후기와 함께 피부 진정과 재생 효과를 강조.<br>4. Dear, Klairs – Vitamin Drop: 피부 톤 개선과 광채 효과를 중심으로 사용자 경험 공유...</p>
+                </div>
+                <div class="strategy-card">
+                    <h4 class="font-bold text-lg text-sky-400 mb-2">🎨 크리에이티브 컨셉 도출</h4>
+                    <p class="text-sm text-slate-400">✅ 추천 포지셔닝 전략 (말레이시아 시장용)<br>"Wedding Glow in 30 Days" 캠페인<br>Laneige보다 합리적인 대안 / Ordinary보다 감성적인 선택지<br>TikTok 중심의 신부 스킨 루틴 챌린지 제안<br>주요 비주얼 컨셉: 골드, 새틴, 부드러운 빛, 클로즈업 샷을 활용하여 고급스럽고 순수한 신부의 이미지를 강조...</p>
+                </div>
+                <div class="strategy-card">
+                    <h4 class="font-bold text-lg text-fuchsia-400 mb-2">🌏 타겟 국가 및 고객 분석</h4>
+                    <p class="text-sm text-slate-400">1순위 타겟: 말레이시아 (성장률 12%, K-뷰티 선호도 높음)<br>2순위 타겟: 인도네시아 (인구 수, 이커머스 잠재력)<br>주요 고객 페르소나: 20대 후반 ~ 30대 초반, 결혼을 앞둔 여성. 소셜 미디어 사용이 활발하며 K-콘텐츠에 대한 관심이 높음. 프리미엄 스킨케어에 대한 투자 의향 있음...</p>
+                </div>
+            </div>
+
+            <!-- AI 전략 수립 프로세스 -->
+            <div class="mt-20 md:mt-28">
+                <h3 class="text-3xl font-bold text-center mb-12 text-slate-200">AI 전략 수립 프로세스</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <!-- Step 1 ~ 4 -->
+                    <div class="bg-slate-800/50 backdrop-blur-sm p-6 rounded-xl border border-slate-700 space-y-4">
+                        <div class="flex items-center"><span class="text-2xl font-black text-cyan-400 mr-3">1</span><h4 class="font-bold text-lg text-cyan-400">고객 정의 및 제품 진단</h4></div>
+                        <ul class="list-disc list-inside text-slate-400 text-sm space-y-2 pl-4">
+                            <li><strong class="text-slate-300">핵심 성분:</strong> EGF 10ppm, 펩타이드</li>
+                            <li><strong class="text-slate-300">브랜드 톤:</strong> 고급감, ‘신부 루틴’ 감성</li>
+                            <li><strong class="text-slate-300">타겟 고객:</strong> 결혼 앞둔 여성, 프리미엄 관심층</li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-800/50 backdrop-blur-sm p-6 rounded-xl border border-slate-700 space-y-4">
+                        <div class="flex items-center"><span class="text-2xl font-black text-green-400 mr-3">2</span><h4 class="font-bold text-lg text-green-400">국가별 시장 진입 전략</h4></div>
+                        <ul class="list-disc list-inside text-slate-400 text-sm space-y-2 pl-4">
+                            <li><strong class="text-slate-300">진출 국가:</strong> 말레이시아</li>
+                            <li><strong class="text-slate-300">인증 요건:</strong> NPRA 등록, 말레이어 병기</li>
+                            <li><strong class="text-slate-300">소비자 문화:</strong> 미백·광채 선호, SNS 후기 민감</li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-800/50 backdrop-blur-sm p-6 rounded-xl border border-slate-700 space-y-4">
+                        <div class="flex items-center"><span class="text-2xl font-black text-amber-400 mr-3">3</span><h4 class="font-bold text-lg text-amber-400">트렌드 및 콘텐츠 벤치마크</h4></div>
+                        <ul class="list-disc list-inside text-slate-400 text-sm space-y-2 pl-4">
+                            <li><strong class="text-slate-300">성공 사례:</strong> Glow Recipe, Laneige 등</li>
+                            <li><strong class="text-slate-300">수집 포맷:</strong> TikTok 콘텐츠, 상세페이지 키비주얼, SNS 캠페인 키카피</li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-800/50 backdrop-blur-sm p-6 rounded-xl border border-slate-700 space-y-4">
+                        <div class="flex items-center"><span class="text-2xl font-black text-rose-400 mr-3">4</span><h4 class="font-bold text-lg text-rose-400">키비주얼 및 크리에이티브 개발</h4></div>
+                        <ul class="list-disc list-inside text-slate-400 text-sm space-y-2 pl-4">
+                            <li><strong class="text-slate-300">4가지 콘셉트 제작:</strong> Glow Recipe 톤 등</li>
+                            <li><strong class="text-slate-300">감성+기능 슬로건:</strong> "Bridal Glow in 30 Days"</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 페이지 5: AI 상세페이지 생성 -->
+        <section id="detail" class="page-section">
+            <header class="text-center max-w-4xl mx-auto">
+                <h1 class="text-4xl md:text-6xl font-black leading-tight mb-4 bg-clip-text text-transparent bg-gradient-to-r from-amber-300 via-orange-400 to-rose-500">
+                    상세페이지, 더 이상 밤새지 마세요.<br>URL 하나면 AI가 전부 알아서.
+                </h1>
+                <p class="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto mt-6">
+                    잘 만든 경쟁사 상세페이지 URL 하나만 알려주세요. AI가 핵심 논리와 구조를 분석하여, 우리 제품에 맞는 설득력 있는 상세페이지를 순식간에 완성합니다.
+                </p>
+            </header>
+            
+            <div class="my-20 md:my-28">
+                <h3 class="text-3xl font-bold text-center mb-12 text-slate-200">AI 상세페이지 제작 프로세스</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <div class="flex items-center bg-slate-800/50 p-4 rounded-lg border border-slate-700"><span class="text-3xl font-black text-slate-500 mr-4">1</span><div><h4 class="font-bold text-slate-200">고객 브리프 입력</h4><p class="text-sm text-slate-400">제품 정보와 타겟 고객을 알려주세요.</p></div></div>
+                    <div class="flex items-center bg-slate-800/50 p-4 rounded-lg border border-slate-700"><span class="text-3xl font-black text-slate-500 mr-4">2</span><div><h4 class="font-bold text-slate-200">벤치마크 URL 제출</h4><p class="text-sm text-slate-400">분석할 URL을 입력해요.</p></div></div>
+                    <div class="flex items-center bg-slate-800/50 p-4 rounded-lg border border-slate-700"><span class="text-3xl font-black text-slate-500 mr-4">3</span><div><h4 class="font-bold text-slate-200">AI 상세페이지 생성</h4><p class="text-sm text-slate-400">AI가 논리 구조와 디자인을 완성합니다.</p></div></div>
+                    <div class="flex items-center bg-slate-800/50 p-4 rounded-lg border border-slate-700"><span class="text-3xl font-black text-slate-500 mr-4">4</span><div><h4 class="font-bold text-slate-200">전문가 수정 완성</h4><p class="text-sm text-slate-400">전문가가 최종 터치하여 완성도를 높입니다.</p></div></div>
+                </div>
+            </div>
+
+            <div>
+                 <h3 class="text-3xl font-bold text-center mb-12 text-slate-200">AI 생성 상세페이지 예시</h3>
+                 <div class="max-w-4xl mx-auto p-4 md:p-8 bg-slate-900/50 backdrop-blur-sm rounded-2xl border-2 border-slate-700 shadow-2xl shadow-indigo-500/20 space-y-8">
+                     <img src="https://gi.esmplus.com/meme153/%EC%9A%B8%EA%B8%88%EC%83%81%EC%84%B8_860_0525.jpg" 
+                          alt="AI가 생성한 화장품 상세페이지 예시 1"
+                          class="w-full h-auto rounded-lg"
+                          onerror="this.onerror=null;this.src='https.placehold.co/860x1200/1e293b/ffffff?text=Example+1';">
+                    <img src="https://gi.esmplus.com/meme153/%EB%B8%94%EB%A3%A8%EB%B2%A0%EB%A6%AC%EC%83%81%EC%84%B8.jpg" 
+                          alt="AI가 생성한 화장품 상세페이지 예시 2"
+                          class="w-full h-auto rounded-lg"
+                          onerror="this.onerror=null;this.src='https.placehold.co/860x1200/1e293b/ffffff?text=Example+2';">
+                 </div>
+            </div>
+        </section>
+
+    </div>
+
+    <footer class="text-center mt-8 mb-16 text-slate-500">
+        <p>&copy; 2025 AI Marketing Suite. All Rights Reserved.</p>
+    </footer>
+
     <script>
-        // JavaScript content trimmed for brevity
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- 페이지별 배경 이미지 설정 ---
+            const backgroundWrapper = document.getElementById('background-wrapper');
+            const backgroundMap = {
+                'solution': 'https://gi.esmplus.com/meme153/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%202025-06-10%20114043.png',
+                'design': 'https://gi.esmplus.com/meme153/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%202025-06-07%20231059.png',
+                'model': 'https://gi.esmplus.com/meme153/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%202025-06-13%20105435.png',
+                'strategy': 'https://gi.esmplus.com/meme153/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%202025-06-06%20011613.png',
+                'detail': 'https://gi.esmplus.com/meme153/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7%202025-06-07%20231059.png' // 이미지 재사용
+            };
+
+            function setPageBackground(pageId) {
+                const imageUrl = backgroundMap[pageId] || backgroundMap['solution'];
+                // 부드러운 전환을 위해 이미지 미리 로드
+                const img = new Image();
+                img.src = imageUrl;
+                img.onload = () => {
+                    backgroundWrapper.style.backgroundImage = `url('${imageUrl}')`;
+                };
+            }
+            // --- //페이지별 배경 이미지 설정 ---
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const pageSections = document.querySelectorAll('.page-section');
+
+            // 페이지 네비게이션 함수
+            window.navigateTo = function(pageId) {
+                // 배경 전환
+                setPageBackground(pageId);
+
+                // 모든 섹션 숨기기
+                pageSections.forEach(section => {
+                    section.classList.remove('visible');
+                    section.style.display = 'none';
+                });
+
+                // 타겟 섹션 보이기
+                const targetSection = document.getElementById(pageId);
+                if (targetSection) {
+                    targetSection.style.display = 'block';
+                    requestAnimationFrame(() => {
+                        targetSection.classList.add('visible');
+                    });
+                }
+
+                // 네비게이션 링크 활성화
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${pageId}`) {
+                        link.classList.add('active');
+                    }
+                });
+            };
+
+            // 네비게이션 링크 클릭 이벤트
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const pageId = link.getAttribute('href').substring(1);
+                    navigateTo(pageId);
+                    if (history.pushState) {
+                        history.pushState(null, null, `#${pageId}`);
+                    } else {
+                        window.location.hash = pageId;
+                    }
+                });
+            });
+            
+            // 페이지 로드 및 뒤로가기/앞으로가기 처리
+            function handleLocation() {
+                const pageId = window.location.hash.substring(1) || 'solution';
+                navigateTo(pageId);
+            }
+            handleLocation();
+            window.addEventListener('popstate', handleLocation);
+        });
     </script>
 </body>
 </html>
